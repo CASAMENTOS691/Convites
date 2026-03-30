@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #weather { margin-bottom: 20px; }
+        #forecast { display: flex; flex-wrap: wrap; }
+        .forecast-day { border: 1px solid #ccc; padding: 10px; margin: 5px; flex: 1 1 18%; }
+    </style>
+</head>
+<body>
+    <h1>Weather Dashboard</h1>
+    <div id="weather">
+        <h2>Current Weather</h2>
+        <div id="current"></div>
+    </div>
+    <div id="forecast">
+        <h2>5-Day Forecast</h2>
+        <!-- Forecast days will be dynamically added here -->
+    </div>
+
+    <script>
+        const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+        const city = 'YOUR_CITY'; // Replace with the city you want to fetch
+
+        async function fetchWeather() {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+            const data = await response.json();
+            displayCurrentWeather(data);
+        }
+
+        function displayCurrentWeather(data) {
+            const currentDiv = document.getElementById('current');
+            currentDiv.innerHTML = `<p>Temperature: ${data.main.temp} °C</p>\n                <p>Humidity: ${data.main.humidity}%</p>\n                <p>Wind Speed: ${data.wind.speed} m/s</p>`;
+        }
+
+        async function fetchForecast() {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+            const data = await response.json();
+            displayForecast(data);
+        }
+
+        function displayForecast(data) {
+            const forecastDiv = document.getElementById('forecast');
+            data.list.forEach((day, index) => {
+                if (index % 8 === 0) { // Get forecast for each day
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'forecast-day';
+                    dayDiv.innerHTML = `<p>Date: ${new Date(day.dt * 1000).toLocaleDateString()}</p>\n                    <p>Temp: ${day.main.temp} °C</p>\n                    <p>Humidity: ${day.main.humidity}%</p>\n                    <p>Wind Speed: ${day.wind.speed} m/s</p>`;
+                    forecastDiv.appendChild(dayDiv);
+                }
+            });
+        }
+
+        fetchWeather();
+        fetchForecast();
+    </script>
+</body>
+</html>
